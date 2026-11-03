@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "project": {
+    "name": "Career Pipeline",
+    "productType": "Personal job search tracker",
+    "stack": ["Next.js App Router", "TypeScript", "Tailwind CSS", "Supabase"]
+  },
+  "sources": {
+    "tokens": ["src/app/globals.css"],
+    "components": [],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {
+      "background": "#f7f8f6",
+      "foreground": "#242e2b",
+      "primary": "#245547",
+      "border": "#e4e7e1"
+    },
+    "typography": {
+      "sans": "Segoe UI, Arial, Helvetica, sans-serif"
+    },
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "comfortable"
+  },
+  "components": {
+    "installed": ["lucide-react icons"],
+    "preferredPrimitives": ["Native dialog", "HTML form controls"],
+    "patterns": [
+      "Sidebar workspace",
+      "Task list with priority headers",
+      "Scrollable table on small screens"
+    ]
+  },
+  "constraints": {
+    "must": [
+      "Light theme",
+      "Mobile friendly",
+      "Readable buttons",
+      "No heavy UI library",
+      "Three colored follow-up queues"
+    ],
+    "avoid": [
+      "Decorative gradients",
+      "Animations beyond loading indicators",
+      "Deployment automation"
+    ]
+  },
+  "decisions": [],
+  "evidence": [
+    "21st Task List Card and Dashboard Sidebar catalog metadata used as layout inspiration; no catalog code retrieved."
+  ],
+  "generatedAt": "2026-11-03T11:05:38.189Z"
+}
