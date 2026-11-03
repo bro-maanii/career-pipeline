@@ -1,0 +1,274 @@
+.tutorial-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+  color: #283c32;
+  z-index: 1000;
+  font-family: "Segoe UI", sans-serif;
+}
+.tutorial-dialog::backdrop {
+  background: transparent;
+}
+.tutorial-shade {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.tutorial-spotlight {
+  position: fixed;
+  border: 2px solid #c4de9e;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 4px #d7eabb20,
+    0 0 30px #162d2820;
+  pointer-events: none;
+}
+.tutorial-panel {
+  position: fixed;
+  box-sizing: border-box;
+  background: #fcfdf9;
+  border: 1px solid #d8e3cd;
+  border-radius: 15px;
+  box-shadow: 0 22px 80px #071d2550;
+  padding: 21px 24px 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.tutorial-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.tutorial-toolbar > span {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #647e52;
+  font-weight: 700;
+}
+.tutorial-close {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: #eff3e8;
+  color: #6a7f5e;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tutorial-progress {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border: 0;
+  border-radius: 4px;
+  background: #e8eddf;
+  margin: 14px 0 18px;
+}
+.tutorial-progress::-webkit-progress-bar {
+  background: #e8eddf;
+  border-radius: 4px;
+}
+.tutorial-progress::-webkit-progress-value {
+  background: #8faa71;
+  border-radius: 4px;
+}
+.tutorial-progress::-moz-progress-bar {
+  background: #8faa71;
+  border-radius: 4px;
+}
+.tutorial-language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #66785b;
+  gap: 12px;
+}
+.tutorial-language select {
+  border: 1px solid #dce4d2;
+  background: #f5f8ef;
+  border-radius: 5px;
+  padding: 5px 24px 5px 8px;
+  font-size: 10px;
+  color: #567446;
+  min-width: 112px;
+  height: auto;
+}
+.tutorial-panel h2 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: -0.7px;
+  line-height: 1.2;
+  color: #335039;
+  margin: 18px 0 12px;
+}
+.tutorial-panel h2:focus {
+  outline: none;
+}
+.tutorial-panel p {
+  font-size: 12px;
+  color: #64765a;
+  line-height: 1.85;
+  margin: 0 0 24px;
+}
+.tutorial-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+.tutorial-navigation .btn {
+  font-size: 11px;
+  min-height: 38px;
+  padding: 9px 15px;
+  gap: 14px;
+}
+.tutorial-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  color: #718364;
+  font-size: 11px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.tutorial-back:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.tutorial-skip {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  border-top: 1px solid #e7ecdf;
+  margin-top: 18px;
+  padding-top: 13px;
+}
+.tutorial-skip button,
+.tutorial-text-button {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  font-size: 10px;
+  color: #66785b;
+  padding: 3px 0;
+  cursor: pointer;
+}
+.tutorial-skip button:hover,
+.tutorial-text-button:hover {
+  color: #34553a;
+  text-decoration: underline;
+}
+.tutorial-skip button:last-child:not(:nth-child(2)) {
+  margin-left: auto;
+  font-size: 9px;
+}
+.tutorial-loading {
+  display: block;
+  font-size: 10px;
+  color: #60784c;
+  margin: -12px 0 15px;
+}
+.tutorial-done-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eaf2df;
+  color: #7a9b5e;
+  margin: 22px auto 10px;
+}
+.tutorial-complete {
+  text-align: center;
+}
+.tutorial-complete .tutorial-toolbar {
+  text-align: left;
+}
+.tutorial-complete h2 {
+  margin-top: 19px;
+}
+.tutorial-complete-actions {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin: 8px 0 7px;
+}
+.tutorial-complete-actions .btn {
+  font-size: 11px;
+}
+.tutorial-panel button:focus-visible,
+.tutorial-panel a:focus-visible,
+.tutorial-panel select:focus-visible {
+  outline: 3px solid #9bbd7e;
+  outline-offset: 3px;
+}
+.workspace-tutorial-mobile {
+  display: none;
+}
+.topbar .tutorial-workspace-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.topbar .tutorial-launch {
+  font-size: 11px;
+  padding: 7px 11px;
+  min-height: 0;
+  gap: 6px;
+}
+.workspace-tutorial-mobile .btn {
+  font-size: 11px;
+  min-height: 32px;
+  padding: 7px 10px;
+}
+.tutorial-dialog button {
+  touch-action: manipulation;
+}
+@media (max-width: 700px) {
+  .workspace-tutorial-mobile {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 20px 0;
+  }
+  .tutorial-panel {
+    padding: 17px 20px 14px;
+    border-radius: 13px;
+  }
+  .tutorial-panel h2 {
+    font-size: 24px;
+    margin: 15px 0 10px;
+  }
+  .tutorial-panel p {
+    font-size: 12px;
+    line-height: 1.75;
+    margin-bottom: 19px;
+  }
+  .tutorial-progress {
+    margin: 10px 0 12px;
+  }
+  .tutorial-skip {
+    margin-top: 14px;
+    padding-top: 10px;
+  }
+  .tutorial-complete .tutorial-done-icon {
+    margin-top: 16px;
+  }
+}

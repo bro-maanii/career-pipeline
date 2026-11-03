@@ -91,7 +91,7 @@ export default function InterviewsPage() {
             </div>
           </section>
         )}
-        <section className="table-panel">
+        <section className="table-panel" data-tour="interviews-journal">
           <div className="table-toolbar">
             <div className="filters">
               <label className="search-field">

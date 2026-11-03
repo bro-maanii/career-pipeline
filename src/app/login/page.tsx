@@ -10,7 +10,7 @@ export default async function LoginPage({
   const supabase = await createClient();
   if (supabase) {
     const { data } = await supabase.auth.getUser();
-    if (data.user) redirect("/");
+    if (data.user) redirect("/today");
   }
   const params = await searchParams;
   const notice =

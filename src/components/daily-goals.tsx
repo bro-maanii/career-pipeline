@@ -11,6 +11,7 @@ export function DailyGoals({ compact = false }: { compact?: boolean }) {
     <section
       className={`daily-goals ${compact ? "daily-goals-compact" : ""}`}
       aria-label="Daily targets"
+      data-tour="daily-goals"
     >
       <div className="goals-title">
         <div>

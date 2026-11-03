@@ -109,6 +109,7 @@ export default function ApplicationsPage() {
           <button
             className="btn btn-secondary"
             onClick={() => setImporting(true)}
+            data-tour="applications-import"
           >
             <Upload size={17} /> Import tracker
           </button>
@@ -126,14 +127,18 @@ export default function ApplicationsPage() {
         </div>
       </div>
       <DataState>
-        <section className="table-panel">
+        <section className="table-panel" data-tour="applications-list">
           <div className="table-toolbar">
             <div className="table-title">
               <h2>
                 All applications{" "}
                 <span className="neutral-badge">{applications.length}</span>
               </h2>
-              <div className="view-switch" aria-label="Application layout">
+              <div
+                className="view-switch"
+                data-tour="applications-view"
+                aria-label="Application layout"
+              >
                 <button
                   className={view === "table" ? "selected" : ""}
                   aria-pressed={view === "table"}
@@ -152,7 +157,7 @@ export default function ApplicationsPage() {
                 </button>
               </div>
             </div>
-            <div className="filters">
+            <div className="filters" data-tour="applications-filters">
               <label className="search-field">
                 <Search size={17} />
                 <input

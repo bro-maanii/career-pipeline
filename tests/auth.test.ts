@@ -6,11 +6,17 @@ import {
   signupValidation,
   emailCallbackPath,
 } from "../src/lib/auth";
-test("only the explicit authentication routes are public", () => {
-  for (const path of ["/login", "/signup", "/auth/callback", "/auth/confirm"])
-    assert.equal(isPublicAuthPath(path), true);
+test("only the landing and explicit authentication routes are public", () => {
   for (const path of [
     "/",
+    "/login",
+    "/signup",
+    "/auth/callback",
+    "/auth/confirm",
+  ])
+    assert.equal(isPublicAuthPath(path), true);
+  for (const path of [
+    "/today",
     "/applications",
     "/contacts",
     "/templates",

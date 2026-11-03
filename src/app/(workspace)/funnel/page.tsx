@@ -81,7 +81,7 @@ export default function FunnelPage() {
             </div>
           ))}
         </div>
-        <div className="report-grid">
+        <div className="report-grid" data-tour="funnel-report">
           <section className="report-panel">
             <div className="report-heading">
               <span className="eyebrow">APPLICATIONS ONLY</span>
@@ -190,7 +190,10 @@ export default function FunnelPage() {
             </section>
           </div>
         </div>
-        <section className="table-panel source-report">
+        <section
+          className="table-panel source-report"
+          data-tour="funnel-sources"
+        >
           <div className="table-toolbar table-title">
             <h2>Source performance</h2>
             <span className="muted">Only applications marked as applied</span>

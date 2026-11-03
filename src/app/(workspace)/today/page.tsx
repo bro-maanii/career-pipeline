@@ -126,7 +126,7 @@ export default function TodayPage() {
   }
   return (
     <>
-      <div className="page-heading">
+      <div className="page-heading" data-tour="today-overview">
         <div>
           <span className="eyebrow">
             {today
@@ -145,12 +145,20 @@ export default function TodayPage() {
           </h1>
           <p>A few conversations today. New possibilities tomorrow.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setAdding(true)}>
+        <button
+          className="btn btn-primary"
+          data-tour="today-add"
+          onClick={() => setAdding(true)}
+        >
           <Plus size={18} /> Add application
         </button>
       </div>
       <DataState>
-        <section className="stats-strip" aria-label="Application statistics">
+        <section
+          className="stats-strip"
+          data-tour="today-stats"
+          aria-label="Application statistics"
+        >
           {[
             {
               label: "Total applications",
@@ -214,6 +222,7 @@ export default function TodayPage() {
             return (
               <section
                 className={`queue-section queue-${section.color}`}
+                data-tour={`queue-${kind}`}
                 key={kind}
               >
                 <div className="queue-header">

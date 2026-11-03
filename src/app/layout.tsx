@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./landing.css";
+import "./tutorial.css";
 export const metadata: Metadata = {
   title: "Career Pipeline · Your next chapter",
   description:

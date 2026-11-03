@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
         token_hash: tokenHash,
         type,
       });
-      if (!error) return NextResponse.redirect(new URL("/", request.url));
+      if (!error) return NextResponse.redirect(new URL("/today", request.url));
     }
   }
   return NextResponse.redirect(

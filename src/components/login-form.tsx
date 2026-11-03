@@ -60,7 +60,7 @@ export function LoginForm({
         });
         if (error) throw error;
       }
-      router.replace("/");
+      router.replace("/today");
       router.refresh();
     } catch (e) {
       setError(
@@ -74,7 +74,7 @@ export function LoginForm({
   return (
     <main className="login-layout">
       <section className="login-story">
-        <Link href="/login" className="brand">
+        <Link href="/" className="brand">
           <span className="brand-symbol">
             <ChartNoAxesColumnIncreasing size={23} />
           </span>

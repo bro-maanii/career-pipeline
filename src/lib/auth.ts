@@ -1,4 +1,5 @@
 const PUBLIC_AUTH_PATHS = new Set([
+  "/",
   "/login",
   "/signup",
   "/auth/callback",

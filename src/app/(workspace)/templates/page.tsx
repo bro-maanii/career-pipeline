@@ -79,11 +79,15 @@ export default function TemplatesPage() {
           </h1>
           <p>A thoughtful starting point. Add your own voice.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => edit()}>
+        <button
+          className="btn btn-primary"
+          data-tour="templates-create"
+          onClick={() => edit()}
+        >
           <Plus size={18} /> New template
         </button>
       </div>
-      <div className="template-tip">
+      <div className="template-tip" data-tour="templates-library">
         <MessageSquare size={20} />
         <p>
           Keep it personal. <code>{"{name}"}</code> uses your contact’s first

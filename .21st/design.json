@@ -6,7 +6,11 @@
     "stack": ["Next.js App Router", "TypeScript", "Tailwind CSS", "Supabase"]
   },
   "sources": {
-    "tokens": ["src/app/globals.css"],
+    "tokens": [
+      "src/app/globals.css",
+      "src/app/landing.css",
+      "src/app/tutorial.css"
+    ],
     "components": [],
     "assets": [],
     "instructions": []
@@ -47,15 +51,18 @@
     ],
     "avoid": [
       "Decorative gradients",
-      "Animations beyond loading indicators",
+      "Unrequested workspace animations; landing motion is explicitly authorized",
       "Deployment automation"
     ]
   },
   "decisions": [
+    "2026-11-04: User replaced the landing's quiet green theme with a funky purple/lavender, acid-yellow, and coral poster style. GSAP handles entrance, scroll reveals, floating stickers, and a marquee. Pause/reduced-motion and tutorial alignment are required. Workspace colors stay forest green.",
+    "2026-11-04: Labeled fictional product previews introduce the app. Native spotlight tutorials cover the landing and all seven workspace routes, with English/Roman Urdu and skip/replay controls. No deployment.",
     "2026-11-04: Each signed-up account is a private tenant. Reuse the existing auth design for signup and email confirmation, with no shared data views.",
     "2026-11-04: Follow the reference workbook's distinct applications, outbound contacts, interview learning, daily activity, and source/funnel workflows. Keep the light forest-green design and primary follow-up dashboard."
   ],
   "evidence": [
+    "21st Colorful Bento Grid and Bento Dashboard catalog metadata informed the landing's playful panel composition; no catalog code retrieved.",
     "21st Task List Card and Dashboard Sidebar catalog metadata used as layout inspiration; no catalog code retrieved."
   ],
   "generatedAt": "2026-11-03T11:05:38.189Z"

@@ -40,7 +40,17 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_PUBLIC_KEY
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000) and sign in, or choose **Create an account**. Restart the dev server after editing environment variables. Without keys, auth screens explain setup and submissions stay disabled. `/login`, `/signup`, and email confirmation endpoints are public; workspace pages and the import API require authentication. `.env.local` is ignored by Git.
+Open [localhost:3000](http://localhost:3000) for the public landing page, then sign in or create an account. Signed-in users enter the dashboard at `/today`. Restart the dev server after editing environment variables. Without keys, auth screens explain setup and submissions stay disabled. `/`, `/login`, `/signup`, and email confirmation endpoints are public; workspace pages and the import API require authentication. `.env.local` is ignored by Git.
+
+## Landing page and guided tutorial
+
+The landing page introduces each workflow with clearly labeled fictional examples, a lavender/purple poster theme, acid-yellow/coral accents, and GSAP entrance, floating, marquee, and scroll-reveal animations. Use the header's **Motion** button to pause/play. OS reduced-motion settings keep the page static. GSAP loads only on the landing route, and its contexts clean up when leaving the page. Opening the tutorial stops/reverts the motion so targets remain visible and aligned. Implementation follows the [GSAP matchMedia cleanup guidance](https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/).
+
+**Tutorial** or **Show me around** launches a sample tour for visitors. For a signed-in visitor, the tutorial opens the real workspace at `/today?tour=start`.
+
+Every workspace page has a **Tutorial** button, including on mobile. The 22-step guide visits all seven sections, scrolls the current control into view, highlights it, and explains how to use it. Choose English or Roman Urdu. Use **Next**, **Back**, **Skip step**, **Skip all**, **Restart**, or Escape; completion also offers replay. Arrow keys move between steps. The modal traps keyboard focus and prevents background actions while explaining controls. The tutorial makes no database changes.
+
+In-progress steps and language are saved locally in the browser, separately per account. An interrupted guide resumes when reopened; a skipped or completed guide starts again. The tutorial does not launch automatically for ordinary visits. No SQL migration is needed for the landing page or tutorial.
 
 ## Private accounts and email confirmation
 
@@ -145,7 +155,8 @@ No deployment is performed as part of this project setup.
 ## Structure
 
 ```text
-src/app/(workspace)/    Protected Today, Applications, Contacts, Interviews, Activity, Funnel, Templates routes
+src/app/page.tsx        Public landing page with fictional product previews
+src/app/(workspace)/    Protected /today, Applications, Contacts, Interviews, Activity, Funnel, Templates routes
 src/components/        Small forms, tables, message drawer, shared workspace state
 src/lib/               Types, dates, follow-up rules, CSV parsing, Supabase clients
 src/proxy.ts           Session refresh and redirect protection

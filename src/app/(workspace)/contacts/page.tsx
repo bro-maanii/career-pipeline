@@ -61,7 +61,7 @@ export default function ContactsPage() {
   }
   return (
     <>
-      <div className="page-heading">
+      <div className="page-heading" data-tour="contacts-overview">
         <div>
           <span className="eyebrow">BUILD RELATIONSHIPS BEYOND JOB POSTS</span>
           <h1>
@@ -103,7 +103,7 @@ export default function ContactsPage() {
             </button>
           ))}
         </div>
-        <section className="table-panel">
+        <section className="table-panel" data-tour="contacts-list">
           <div className="table-toolbar">
             <div className="filters">
               <label className="search-field">

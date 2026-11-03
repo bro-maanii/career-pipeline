@@ -249,7 +249,7 @@ export default function ActivityPage() {
             See what you did, record the rest, and keep your targets realistic.
           </p>
         </div>
-        <div className="heading-actions">
+        <div className="heading-actions" data-tour="activity-controls">
           <button
             className="btn btn-secondary"
             onClick={() => setTargetEditor(true)}
@@ -269,7 +269,10 @@ export default function ActivityPage() {
       </div>
       <DataState extended>
         <DailyGoals />
-        <section className="table-panel activity-history">
+        <section
+          className="table-panel activity-history"
+          data-tour="activity-history"
+        >
           <div className="table-toolbar table-title">
             <h2>Activity history</h2>
             <button

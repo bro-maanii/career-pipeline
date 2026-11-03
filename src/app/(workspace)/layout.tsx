@@ -14,7 +14,10 @@ export default async function WorkspaceLayout({
   if (error || !data.user) redirect("/login");
   return (
     <WorkspaceProvider key={data.user.id} userId={data.user.id}>
-      <AppShell email={data.user.email || "Personal workspace"}>
+      <AppShell
+        userId={data.user.id}
+        email={data.user.email || "Personal workspace"}
+      >
         {children}
       </AppShell>
     </WorkspaceProvider>
