@@ -20,10 +20,17 @@ import { ApplicationForm } from "@/components/application-form";
 import { MessageDrawer } from "@/components/message-drawer";
 import { isDue, overdueDays } from "@/lib/followups";
 import { FOLLOWUP_1_DAYS, FOLLOWUP_2_DAYS } from "@/lib/config";
+import { DailyGoals } from "@/components/daily-goals";
+import { ContactMessage } from "@/components/contact-message";
+import { InterviewForm } from "@/components/tracker-forms";
+import { contactNextStep, dailyMetrics, stagesFor } from "@/lib/tracker";
+import { prettyDate } from "@/lib/dates";
 import {
   TEMPLATE_KINDS,
   type Application,
   type TemplateKind,
+  type Contact,
+  type Interview,
 } from "@/lib/types";
 const sections = {
   first_message: {
@@ -49,13 +56,36 @@ const sections = {
   },
 };
 export default function TodayPage() {
-  const { applications, today, saveApplication, notify } = useWorkspace();
+  const {
+    applications,
+    contacts,
+    interviews,
+    dailyLogs,
+    needsMigration,
+    today,
+    saveApplication,
+    notify,
+  } = useWorkspace();
   const [adding, setAdding] = useState(false);
   const [selected, setSelected] = useState<{
     app: Application;
     kind: TemplateKind;
   } | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+  const [outreach, setOutreach] = useState<Contact | null>(null);
+  const [interview, setInterview] = useState<Interview | null>(null);
+  const outreachTasks = today
+    ? contacts
+        .map((contact) => ({ contact, step: contactNextStep(contact, today) }))
+        .filter((item) => item.step !== null)
+        .sort((a, b) => b.step!.overdue - a.step!.overdue)
+    : [];
+  const upcoming = today
+    ? interviews
+        .filter((i) => i.scheduled_on >= today && i.result === "Pending")
+        .sort((a, b) => a.scheduled_on.localeCompare(b.scheduled_on))
+        .slice(0, 3)
+    : [];
   const queues = TEMPLATE_KINDS.map((kind) => ({
     kind,
     apps: applications
@@ -66,15 +96,11 @@ export default function TodayPage() {
           (overdueDays(a, kind, today) ?? -1),
       ),
   }));
-  const totalDue = queues.reduce((sum, q) => sum + q.apps.length, 0);
-  const appliedToday = applications.filter(
-    (a) => a.applied && a.applied_on === today,
-  ).length;
-  const followupsToday = applications.reduce(
-    (sum, a) =>
-      sum + Number(a.followup1_on === today) + Number(a.followup2_on === today),
-    0,
-  );
+  const totalDue =
+    queues.reduce((sum, q) => sum + q.apps.length, 0) + outreachTasks.length;
+  const activity = dailyMetrics(today, applications, contacts, dailyLogs);
+  const appliedToday = activity.applications;
+  const followupsToday = activity.followups;
   async function mark(app: Application, kind: TemplateKind) {
     if (!today) return;
     setPending(app.id);
@@ -134,13 +160,13 @@ export default function TodayPage() {
             },
             {
               label: "Replied",
-              value: applications.filter((a) => a.status === "Replied").length,
+              value: applications.filter((a) => stagesFor(a).replied).length,
               icon: Reply,
               className: "stat-blue",
             },
             {
               label: "Interviews",
-              value: applications.filter((a) => a.status === "Interview")
+              value: applications.filter((a) => stagesFor(a).interviewed)
                 .length,
               icon: Users,
               className: "stat-green",
@@ -163,6 +189,7 @@ export default function TodayPage() {
             </div>
           ))}
         </section>
+        {!needsMigration && <DailyGoals compact />}
         <div className="focus-heading">
           <div>
             <h2>
@@ -278,6 +305,72 @@ export default function TodayPage() {
             );
           })}
         </div>
+        {outreachTasks.length > 0 && (
+          <section className="outreach-today">
+            <div className="section-heading">
+              <div>
+                <span className="eyebrow">YOUR OTHER CONVERSATIONS</span>
+                <h2>
+                  Outreach to follow through{" "}
+                  <span className="neutral-badge">{outreachTasks.length}</span>
+                </h2>
+              </div>
+              <Link className="text-link" href="/contacts">
+                View contacts <ChevronRight size={15} />
+              </Link>
+            </div>
+            {outreachTasks.slice(0, 5).map(({ contact, step }) => (
+              <div className="queue-row" key={contact.id}>
+                <button
+                  className="person-button"
+                  onClick={() => setOutreach(contact)}
+                >
+                  <span className="avatar">{contact.person.slice(0, 1)}</span>
+                  <span className="person-info">
+                    <strong>{contact.person}</strong>
+                    <span>
+                      {contact.company || "Independent contact"} · {step!.label}
+                      {step!.overdue > 0 ? ` · ${step!.overdue}d overdue` : ""}
+                    </span>
+                  </span>
+                </button>
+                <button
+                  className="btn btn-secondary btn-small"
+                  onClick={() => setOutreach(contact)}
+                >
+                  Write message <ArrowUpRight size={14} />
+                </button>
+              </div>
+            ))}
+          </section>
+        )}
+        {upcoming.length > 0 && (
+          <section className="upcoming-section today-upcoming">
+            <div className="section-heading">
+              <h2>Next interviews</h2>
+              <Link className="text-link" href="/interviews">
+                Open journal <ChevronRight size={15} />
+              </Link>
+            </div>
+            <div className="upcoming-grid">
+              {upcoming.map((session) => (
+                <button
+                  className="upcoming-card"
+                  key={session.id}
+                  onClick={() => setInterview(session)}
+                >
+                  <Users size={19} />
+                  <div>
+                    <strong>{session.company}</strong>
+                    <span>
+                      {session.stage} · {prettyDate(session.scheduled_on)}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
         <div className="dashboard-bottom">
           <span>
             <span className="workspace-dot" /> Progress is showing up, one day
@@ -289,6 +382,12 @@ export default function TodayPage() {
         </div>
       </DataState>
       {adding && <ApplicationForm close={() => setAdding(false)} />}
+      {outreach && (
+        <ContactMessage contact={outreach} close={() => setOutreach(null)} />
+      )}
+      {interview && (
+        <InterviewForm interview={interview} close={() => setInterview(null)} />
+      )}
       {selected && (
         <MessageDrawer
           app={selected.app}

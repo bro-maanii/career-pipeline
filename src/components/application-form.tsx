@@ -7,6 +7,7 @@ import {
   STATUSES,
   WORK_TYPES,
   SOURCES,
+  MILESTONES,
   type Application,
   type ApplicationInput,
 } from "@/lib/types";
@@ -173,6 +174,40 @@ export function ApplicationForm({
               {field("followup2_on", "Follow-up 2 completed on", "date")}
             </div>
             <h3 className="form-section-title">A little context</h3>
+            <div className="form-grid milestone-form">
+              {(["screening", "interview", "result"] as const).map((key) => (
+                <label className="field" key={key}>
+                  {key === "screening"
+                    ? "Screening progress"
+                    : key === "interview"
+                      ? "Interview progress"
+                      : "Final result"}
+                  <select
+                    value={values[key] || ""}
+                    onChange={(event) => set(key, event.target.value)}
+                  >
+                    {[
+                      ...MILESTONES,
+                      ...(key === "result" ? ["Offer", "Rejected"] : []),
+                      ...(values[key] &&
+                      ![...MILESTONES, "Offer", "Rejected"].includes(
+                        values[key]!,
+                      )
+                        ? [values[key]!]
+                        : []),
+                    ].map((value) => (
+                      <option key={value} value={value}>
+                        {value || "Not recorded"}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+            </div>
+            <p className="field-hint">
+              These fields preserve the stages you reached, even when the
+              current status changes later.
+            </p>
             <div className="form-grid">
               {(
                 [

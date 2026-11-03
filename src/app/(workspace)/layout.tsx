@@ -13,7 +13,7 @@ export default async function WorkspaceLayout({
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) redirect("/login");
   return (
-    <WorkspaceProvider userId={data.user.id}>
+    <WorkspaceProvider key={data.user.id} userId={data.user.id}>
       <AppShell email={data.user.email || "Personal workspace"}>
         {children}
       </AppShell>

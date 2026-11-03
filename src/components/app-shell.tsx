@@ -9,9 +9,23 @@ import {
   Files,
   LogOut,
   ArrowUpRight,
+  Users,
+  BookOpen,
+  Activity,
+  Filter,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useWorkspace, errorMessage } from "./workspace-provider";
+import { MigrationNotice } from "./ui";
+const navigation = [
+  { href: "/", label: "Today", icon: CalendarDays },
+  { href: "/applications", label: "Applications", icon: BriefcaseBusiness },
+  { href: "/contacts", label: "Outreach contacts", icon: Users },
+  { href: "/interviews", label: "Interview journal", icon: BookOpen },
+  { href: "/activity", label: "Daily activity", icon: Activity },
+  { href: "/funnel", label: "Funnel & sources", icon: Filter },
+  { href: "/templates", label: "Message templates", icon: Files },
+];
 export function AppShell({
   email,
   children,
@@ -21,7 +35,7 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { notify } = useWorkspace();
+  const { notify, needsMigration } = useWorkspace();
   const [pending, setPending] = useState(false);
   async function logout() {
     setPending(true);
@@ -47,18 +61,10 @@ export function AppShell({
           </span>
         </Link>
         <div className="workspace-label">
-          <span className="workspace-dot" /> PERSONAL WORKSPACE
+          <span className="workspace-dot" /> PRIVATE WORKSPACE
         </div>
         <nav aria-label="Main navigation">
-          {[
-            { href: "/", label: "Today", icon: CalendarDays },
-            {
-              href: "/applications",
-              label: "Applications",
-              icon: BriefcaseBusiness,
-            },
-            { href: "/templates", label: "Message templates", icon: Files },
-          ].map(({ href, label, icon: Icon }) => (
+          {navigation.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
@@ -110,18 +116,18 @@ export function AppShell({
           <span>
             My workspace <span className="breadcrumb-slash">/</span>{" "}
             <strong>
-              {pathname === "/"
-                ? "Today"
-                : pathname === "/applications"
-                  ? "Applications"
-                  : "Message templates"}
+              {navigation.find((item) => item.href === pathname)?.label ||
+                "Workspace"}
             </strong>
           </span>
           <span className="private-label">
             <span className="workspace-dot" /> Just for you
           </span>
         </div>
-        <main className="page-content">{children}</main>
+        <main className="page-content">
+          {needsMigration && <MigrationNotice />}
+          {children}
+        </main>
         <footer className="workspace-footer">
           One step closer to your next chapter.
         </footer>

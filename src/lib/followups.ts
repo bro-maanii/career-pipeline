@@ -6,6 +6,7 @@ export function isDue(
   kind: TemplateKind,
   today: string,
 ): boolean {
+  if (app.status === "Withdrawn") return false;
   if (kind === "first_message")
     return !!app.contact_name?.trim() && !app.messaged;
   if (["Rejected", "Offer"].includes(app.status)) return false;
@@ -48,7 +49,7 @@ export function fillTemplate(body: string, app: Application): string {
   const values: Record<string, string> = {
     name: app.contact_name?.trim().split(/\s+/)[0] || "there",
     company: app.company,
-    role: app.role || "the open position",
+    role: app.role || "developer",
   };
   return body.replace(
     /\{(name|company|role)\}/g,

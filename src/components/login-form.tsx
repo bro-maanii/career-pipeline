@@ -1,33 +1,72 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   ChartNoAxesColumnIncreasing,
   Check,
   LoaderCircle,
+  MailCheck,
+  LockKeyhole,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-export function LoginForm({ configured }: { configured: boolean }) {
+import { signupValidation } from "@/lib/auth";
+export function LoginForm({
+  configured,
+  mode = "login",
+  notice = "",
+}: {
+  configured: boolean;
+  mode?: "login" | "signup";
+  notice?: string;
+}) {
   const router = useRouter();
+  const isSignup = mode === "signup";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   async function login(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     setError("");
     const form = new FormData(event.currentTarget);
     try {
-      const { error } = await createClient().auth.signInWithPassword({
-        email: String(form.get("email")).trim(),
-        password: String(form.get("password")),
-      });
-      if (error) throw error;
+      const email = String(form.get("email")).trim();
+      const password = String(form.get("password"));
+      if (isSignup) {
+        const validation = signupValidation(
+          password,
+          String(form.get("confirmPassword")),
+        );
+        if (validation) throw new Error(validation);
+        const { data, error } = await createClient().auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+        if (error) throw error;
+        if (!data.session) {
+          setConfirmationEmail(email);
+          setPending(false);
+          return;
+        }
+      } else {
+        const { error } = await createClient().auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+      }
       router.replace("/");
       router.refresh();
     } catch (e) {
       setError(
-        e instanceof Error ? e.message : "Unable to sign in. Please try again.",
+        e instanceof Error
+          ? e.message
+          : "Unable to access your account. Please try again.",
       );
       setPending(false);
     }
@@ -35,12 +74,12 @@ export function LoginForm({ configured }: { configured: boolean }) {
   return (
     <main className="login-layout">
       <section className="login-story">
-        <a href="/login" className="brand">
+        <Link href="/login" className="brand">
           <span className="brand-symbol">
             <ChartNoAxesColumnIncreasing size={23} />
           </span>
           career pipeline<span className="brand-period">.</span>
-        </a>
+        </Link>
         <div className="login-story-copy">
           <span className="eyebrow">A LITTLE MOMENTUM, EVERY DAY</span>
           <h1>
@@ -63,9 +102,13 @@ export function LoginForm({ configured }: { configured: boolean }) {
       </section>
       <section className="login-form-side">
         <div className="login-form-card">
-          <span className="eyebrow">YOUR PERSONAL WORKSPACE</span>
-          <h2>Welcome back.</h2>
-          <p className="muted">A new day. A few small steps forward.</p>
+          <span className="eyebrow">YOUR PRIVATE WORKSPACE</span>
+          <h2>{isSignup ? "Your own workspace." : "Welcome back."}</h2>
+          <p className="muted">
+            {isSignup
+              ? "Create an account for your own job search."
+              : "Sign in to your applications and conversations."}
+          </p>
           {!configured && (
             <div className="setup-note">
               <strong>Let’s connect your workspace</strong>
@@ -76,51 +119,120 @@ export function LoginForm({ configured }: { configured: boolean }) {
               </p>
             </div>
           )}
-          <form onSubmit={login} className="login-form">
-            <label>
-              Email address
-              <input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                autoComplete="username"
-                required
-                disabled={!configured || pending}
-              />
-            </label>
-            <label>
-              Password
-              <input
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                autoComplete="current-password"
-                required
-                disabled={!configured || pending}
-              />
-            </label>
-            {error && (
-              <p className="error-box" role="alert">
-                {error}
+          {notice && (
+            <p className="error-box" role="alert">
+              {notice}
+            </p>
+          )}
+          {confirmationEmail ? (
+            <div className="signup-success" role="status">
+              <span className="signup-success-icon">
+                <MailCheck size={27} />
+              </span>
+              <h3>Check your email</h3>
+              <p>
+                Look for a confirmation link at{" "}
+                <strong>{confirmationEmail}</strong>. Confirm your email to open
+                your private workspace.
               </p>
-            )}
-            <button
-              className="btn btn-primary login-submit"
-              disabled={!configured || pending}
-            >
-              {pending ? (
-                <LoaderCircle className="spin" size={18} />
-              ) : (
+              <p>
+                If you already have an account, sign in with your existing
+                password. No confirmation email may be sent for an existing
+                account.
+              </p>
+              <Link className="btn btn-primary full-width" href="/login">
+                Back to sign in <ArrowRight size={17} />
+              </Link>
+              <button
+                type="button"
+                className="btn btn-quiet full-width"
+                onClick={() => setConfirmationEmail("")}
+              >
+                Use a different email
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={login} className="login-form">
+              <label>
+                Email address
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autoComplete={isSignup ? "email" : "username"}
+                  required
+                  disabled={!configured || pending}
+                />
+              </label>
+              <label>
+                Password
+                <input
+                  name="password"
+                  type="password"
+                  placeholder={
+                    isSignup ? "Create a password" : "Enter your password"
+                  }
+                  autoComplete={isSignup ? "new-password" : "current-password"}
+                  minLength={isSignup ? 8 : undefined}
+                  required
+                  disabled={!configured || pending}
+                />
+              </label>
+              {isSignup && (
                 <>
-                  Sign in to your workspace <ArrowRight size={18} />
+                  <p className="field-hint signup-password-hint">
+                    At least 8 characters. Use a password unique to this
+                    account.
+                  </p>
+                  <label>
+                    Confirm password
+                    <input
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="Enter your password again"
+                      autoComplete="new-password"
+                      required
+                      minLength={8}
+                      disabled={!configured || pending}
+                    />
+                  </label>
                 </>
               )}
-            </button>
-          </form>
+              {error && (
+                <p className="error-box" role="alert">
+                  {error}
+                </p>
+              )}
+              <button
+                className="btn btn-primary login-submit"
+                disabled={!configured || pending}
+              >
+                {pending ? (
+                  <LoaderCircle className="spin" size={18} />
+                ) : (
+                  <>
+                    {isSignup
+                      ? "Create your account"
+                      : "Sign in to your workspace"}{" "}
+                    <ArrowRight size={18} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+          {!confirmationEmail && (
+            <p className="auth-switch">
+              {isSignup ? "Already have an account?" : "New here?"}{" "}
+              <Link href={isSignup ? "/login" : "/signup"}>
+                {isSignup ? "Sign in" : "Create an account"}
+              </Link>
+            </p>
+          )}
           <p className="login-help">
-            Your private space. Sign in with the account
+            <LockKeyhole size={13} /> Your applications, contacts, notes, and
+            templates
             <br />
-            you created in Supabase.
+            stay private to your account.
           </p>
         </div>
       </section>

@@ -9,6 +9,9 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
+  Download,
+  Table2,
+  Columns3,
 } from "lucide-react";
 import { useWorkspace, errorMessage } from "@/components/workspace-provider";
 import { DataState, EmptyState, safeUrl, Modal } from "@/components/ui";
@@ -16,6 +19,8 @@ import { ApplicationForm } from "@/components/application-form";
 import { ImportDialog } from "@/components/import-dialog";
 import { STATUSES, type Application, type Status } from "@/lib/types";
 import { prettyDate } from "@/lib/dates";
+import { ApplicationsBoard } from "@/components/applications-board";
+import { downloadApplicationCsv } from "@/lib/export";
 const PAGE_SIZE = 20;
 export default function ApplicationsPage() {
   const { applications, saveApplication, deleteApplication, notify } =
@@ -30,6 +35,7 @@ export default function ApplicationsPage() {
   const [pending, setPending] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");
   const [page, setPage] = useState(1);
+  const [view, setView] = useState<"table" | "board">("table");
   const filtered = useMemo(
     () =>
       applications.filter(
@@ -104,7 +110,15 @@ export default function ApplicationsPage() {
             className="btn btn-secondary"
             onClick={() => setImporting(true)}
           >
-            <Upload size={17} /> Import CSV
+            <Upload size={17} /> Import tracker
+          </button>
+          <button
+            className="btn btn-secondary"
+            disabled={!filtered.length}
+            onClick={() => downloadApplicationCsv(filtered)}
+          >
+            <Download size={17} />
+            Export CSV
           </button>
           <button className="btn btn-primary" onClick={() => setForm("new")}>
             <Plus size={18} /> Add application
@@ -119,7 +133,24 @@ export default function ApplicationsPage() {
                 All applications{" "}
                 <span className="neutral-badge">{applications.length}</span>
               </h2>
-              <span className="muted">A clearer view of what’s next.</span>
+              <div className="view-switch" aria-label="Application layout">
+                <button
+                  className={view === "table" ? "selected" : ""}
+                  aria-pressed={view === "table"}
+                  onClick={() => setView("table")}
+                >
+                  <Table2 size={15} />
+                  Table
+                </button>
+                <button
+                  className={view === "board" ? "selected" : ""}
+                  aria-pressed={view === "board"}
+                  onClick={() => setView("board")}
+                >
+                  <Columns3 size={15} />
+                  Board
+                </button>
+              </div>
             </div>
             <div className="filters">
               <label className="search-field">
@@ -189,7 +220,14 @@ export default function ApplicationsPage() {
               )}
             </div>
           </div>
-          {!visible.length ? (
+          {view === "board" && filtered.length ? (
+            <ApplicationsBoard
+              applications={filtered}
+              edit={setForm}
+              update={updateStatus}
+              pending={pending}
+            />
+          ) : !visible.length ? (
             <EmptyState
               title={
                 activeFilters

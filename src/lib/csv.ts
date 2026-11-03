@@ -20,6 +20,9 @@ export const emptyApplication = (): ApplicationInput => ({
   followup2_on: null,
   status: "Applied",
   response: "",
+  screening: "",
+  interview: "",
+  result: "",
   salary: "",
   why_applied: "",
   notes: "",
@@ -81,7 +84,11 @@ export function parseImport(
     errors.push('Missing required "Company" header.');
   const rows: ApplicationInput[] = [];
   parsed.data.forEach((record, index) => {
-    if (!Object.values(record).some((v) => typeof v === "string" && v.trim()))
+    if (
+      !Object.entries(record).some(
+        ([key, v]) => key !== "#" && typeof v === "string" && v.trim(),
+      )
+    )
       return;
     const get = (...keys: string[]) => {
       for (const key of keys) {
@@ -139,6 +146,9 @@ export function parseImport(
       errors.push(`Row ${rowNumber}: unknown status "${status}".`);
     app.status = (normalizedStatus || "Applied") as Status;
     app.response = get("response");
+    app.screening = get("screening");
+    app.interview = get("interview");
+    app.result = get("result");
     app.salary = get("salary");
     app.why_applied = get("why applied", "why_applied");
     app.notes = get("notes");

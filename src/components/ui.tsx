@@ -53,8 +53,27 @@ export function Modal({
     </dialog>
   );
 }
-export function DataState({ children }: { children: React.ReactNode }) {
-  const { loading, error, reload } = useWorkspace();
+export function MigrationNotice() {
+  return (
+    <div className="setup-note migration-note">
+      <strong>Your workspace has a new version</strong>
+      <p>
+        Run <code>supabase/migrations/20261104_workbook_workspace.sql</code> in
+        your Supabase SQL Editor, then refresh. This adds contacts, interviews,
+        daily activity, and the extra application fields while preserving your
+        saved records.
+      </p>
+    </div>
+  );
+}
+export function DataState({
+  children,
+  extended = false,
+}: {
+  children: React.ReactNode;
+  extended?: boolean;
+}) {
+  const { loading, error, reload, needsMigration } = useWorkspace();
   if (loading)
     return (
       <div className="loading-state" role="status">
@@ -72,6 +91,7 @@ export function DataState({ children }: { children: React.ReactNode }) {
         </button>
       </div>
     );
+  if (extended && needsMigration) return <MigrationNotice />;
   return children;
 }
 export function EmptyState({
