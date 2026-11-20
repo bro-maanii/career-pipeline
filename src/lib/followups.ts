@@ -1,15 +1,34 @@
 import { FOLLOWUP_1_DAYS, FOLLOWUP_2_DAYS } from "./config";
 import { daysBetween } from "./dates";
-import type { Application, TemplateKind } from "./types";
+import type { Application, Contact, Status, TemplateKind } from "./types";
+/** Statuses that stop every reminder, including the first message. */
+export const STOPPED_STATUSES: Status[] = ["Ghosted", "Withdrawn"];
+/** Only these statuses still need follow-up chasing; a reply or a decision ends it. */
+export const CHASING_STATUSES: Status[] = ["Saved", "Applied", "Contacted"];
+/** Contact statuses that stop every outreach reminder. */
+export const STOPPED_CONTACT_STATUSES: Contact["status"][] = [
+  "Closed",
+  "Not Relevant",
+  "No Reply",
+];
+/** Contact statuses where the person answered, so follow-ups are no longer due. */
+export const ANSWERED_CONTACT_STATUSES: Contact["status"][] = [
+  "Replied",
+  "Interested",
+];
+/** Marking the first message sent moves an early application to Contacted. */
+export function statusAfterMessage(status: Status): Status {
+  return status === "Saved" || status === "Applied" ? "Contacted" : status;
+}
 export function isDue(
   app: Application,
   kind: TemplateKind,
   today: string,
 ): boolean {
-  if (app.status === "Withdrawn") return false;
+  if (STOPPED_STATUSES.includes(app.status)) return false;
   if (kind === "first_message")
     return !!app.contact_name?.trim() && !app.messaged;
-  if (["Rejected", "Offer"].includes(app.status)) return false;
+  if (!CHASING_STATUSES.includes(app.status)) return false;
   if (kind === "followup1")
     return (
       app.messaged &&

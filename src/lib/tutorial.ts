@@ -79,8 +79,8 @@ export const WORKSPACE_TUTORIAL: TutorialStep[] = [
     "/today",
     "queue-followup2",
     "One last check-in",
-    `The second follow-up becomes due ${FOLLOWUP_2_DAYS} calendar days after the first. Offer, Rejected, and Withdrawn applications leave the follow-up queues. Empty queues simply mean nothing is due.`,
-    `Pehle follow-up ke ${FOLLOWUP_2_DAYS} din baad doosra due hota hai. Offer, Rejected aur Withdrawn follow-up queues se nikal jate hain. Khali section ka matlab abhi kuch due nahi.`,
+    `The second follow-up becomes due ${FOLLOWUP_2_DAYS} calendar days after the first. Replied or later stages, Rejected, Ghosted, and Withdrawn applications leave the follow-up queues. Use Reply aaya when they answer, or Chhor do to stop chasing someone. Empty queues simply mean nothing is due.`,
+    `Pehle follow-up ke ${FOLLOWUP_2_DAYS} din baad doosra due hota hai. Reply aane ke baad wale status, Rejected, Ghosted aur Withdrawn follow-up queues se nikal jate hain. Jawab aaye to Reply aaya dabayein, kisi ko chhorna ho to Chhor do. Khali section ka matlab abhi kuch due nahi.`,
     "nav-today",
   ),
   step(

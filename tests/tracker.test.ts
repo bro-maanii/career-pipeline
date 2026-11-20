@@ -2,7 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { parseDate, parseImport, emptyApplication } from "../src/lib/csv";
 import { daysBetween, localToday } from "../src/lib/dates";
-import { isDue, overdueDays, fillTemplate } from "../src/lib/followups";
+import {
+  isDue,
+  overdueDays,
+  fillTemplate,
+  statusAfterMessage,
+} from "../src/lib/followups";
 import type { Application } from "../src/lib/types";
 const app = (values: Partial<Application> = {}): Application => ({
   ...emptyApplication(),
@@ -108,8 +113,18 @@ test("follow-up 1 starts at day 3; missing dates and completed/closed rows stay 
   assert.equal(isDue(base, "followup1", "2026-11-03"), true);
   assert.equal(overdueDays(base, "followup1", "2026-11-03"), 0);
   assert.equal(overdueDays(base, "followup1", "2026-11-05"), 2);
-  for (const status of ["Rejected", "Offer"] as const)
+  for (const status of [
+    "Rejected",
+    "Offer",
+    "Replied",
+    "Screening",
+    "Interview",
+    "Ghosted",
+    "Withdrawn",
+  ] as const)
     assert.equal(isDue({ ...base, status }, "followup1", "2026-11-05"), false);
+  for (const status of ["Saved", "Applied", "Contacted"] as const)
+    assert.equal(isDue({ ...base, status }, "followup1", "2026-11-05"), true);
   assert.equal(
     isDue({ ...base, messaged_on: null }, "followup1", "2026-11-05"),
     false,
@@ -150,4 +165,18 @@ test("local date and calendar-day differences cross year and DST boundaries", ()
   assert.equal(daysBetween("2025-12-31", "2026-01-03"), 3);
   assert.equal(daysBetween("2026-03-07", "2026-03-10"), 3);
   assert.equal(daysBetween("2026-11-03", "2026-11-01"), -2);
+});
+test("ghosted stops the first message; marking a message moves early statuses to Contacted", () => {
+  assert.equal(
+    isDue(
+      app({ contact_name: "Ali", status: "Ghosted" }),
+      "first_message",
+      "2026-11-03",
+    ),
+    false,
+  );
+  assert.equal(statusAfterMessage("Saved"), "Contacted");
+  assert.equal(statusAfterMessage("Applied"), "Contacted");
+  assert.equal(statusAfterMessage("Interview"), "Interview");
+  assert.equal(statusAfterMessage("Rejected"), "Rejected");
 });

@@ -13,15 +13,17 @@ import {
   Reply,
   Users,
   CircleX,
+  BellOff,
 } from "lucide-react";
 import { useWorkspace, errorMessage } from "@/components/workspace-provider";
 import { DataState } from "@/components/ui";
 import { ApplicationForm } from "@/components/application-form";
 import { MessageDrawer } from "@/components/message-drawer";
-import { isDue, overdueDays } from "@/lib/followups";
+import { isDue, overdueDays, statusAfterMessage } from "@/lib/followups";
 import { FOLLOWUP_1_DAYS, FOLLOWUP_2_DAYS } from "@/lib/config";
 import { DailyGoals } from "@/components/daily-goals";
 import { ContactMessage } from "@/components/contact-message";
+import { ReplyDialog, type ReplyTarget } from "@/components/reply-dialog";
 import { InterviewForm } from "@/components/tracker-forms";
 import { contactNextStep, dailyMetrics, stagesFor } from "@/lib/tracker";
 import { prettyDate } from "@/lib/dates";
@@ -64,6 +66,7 @@ export default function TodayPage() {
     needsMigration,
     today,
     saveApplication,
+    saveContact,
     notify,
   } = useWorkspace();
   const [adding, setAdding] = useState(false);
@@ -74,6 +77,7 @@ export default function TodayPage() {
   const [pending, setPending] = useState<string | null>(null);
   const [outreach, setOutreach] = useState<Contact | null>(null);
   const [interview, setInterview] = useState<Interview | null>(null);
+  const [replying, setReplying] = useState<ReplyTarget | null>(null);
   const outreachTasks = today
     ? contacts
         .map((contact) => ({ contact, step: contactNextStep(contact, today) }))
@@ -107,7 +111,11 @@ export default function TodayPage() {
     try {
       await saveApplication(
         kind === "first_message"
-          ? { messaged: true, messaged_on: today }
+          ? {
+              messaged: true,
+              messaged_on: today,
+              status: statusAfterMessage(app.status),
+            }
           : kind === "followup1"
             ? { followup1_on: today }
             : { followup2_on: today },
@@ -115,9 +123,33 @@ export default function TodayPage() {
       );
       notify(
         kind === "first_message"
-          ? "Marked as messaged. Nice work!"
+          ? app.status !== statusAfterMessage(app.status)
+            ? "Marked as messaged. Status is now Contacted."
+            : "Marked as messaged. Nice work!"
           : "Follow-up marked done.",
       );
+    } catch (e) {
+      notify(errorMessage(e));
+    } finally {
+      setPending(null);
+    }
+  }
+  async function stopApp(app: Application) {
+    setPending(app.id);
+    try {
+      await saveApplication({ status: "Ghosted" }, app.id);
+      notify(`${app.company} moved to Ghosted. No more reminders.`);
+    } catch (e) {
+      notify(errorMessage(e));
+    } finally {
+      setPending(null);
+    }
+  }
+  async function stopContact(contact: Contact) {
+    setPending(contact.id);
+    try {
+      await saveContact({ status: "No Reply" }, contact.id);
+      notify(`${contact.person} moved to No Reply. No more reminders.`);
     } catch (e) {
       notify(errorMessage(e));
     } finally {
@@ -295,6 +327,34 @@ export default function TodayPage() {
                               <Check size={15} />
                               {pending === app.id ? "Saving…" : section.action}
                             </button>
+                            {kind !== "first_message" && (
+                              <button
+                                className="btn btn-small btn-quiet"
+                                disabled={!!pending}
+                                title="They answered: choose what the reply means"
+                                onClick={() =>
+                                  setReplying({
+                                    type: "application",
+                                    app,
+                                    kind,
+                                  })
+                                }
+                              >
+                                <Reply size={15} /> Reply aaya
+                              </button>
+                            )}
+                            <button
+                              className="btn btn-small btn-quiet"
+                              disabled={!!pending}
+                              title={
+                                kind === "first_message"
+                                  ? "Connection not accepted or not worth it: set status to Ghosted and remove from Today"
+                                  : "Seen but no reply: set status to Ghosted and stop follow-ups"
+                              }
+                              onClick={() => void stopApp(app)}
+                            >
+                              <BellOff size={15} /> Chhor do
+                            </button>
                           </div>
                         </div>
                       );
@@ -343,12 +403,38 @@ export default function TodayPage() {
                     </span>
                   </span>
                 </button>
-                <button
-                  className="btn btn-secondary btn-small"
-                  onClick={() => setOutreach(contact)}
-                >
-                  Write message <ArrowUpRight size={14} />
-                </button>
+                <div className="queue-actions">
+                  <button
+                    className="btn btn-secondary btn-small"
+                    onClick={() => setOutreach(contact)}
+                  >
+                    Write message <ArrowUpRight size={14} />
+                  </button>
+                  {step!.kind !== "first_message" && (
+                    <button
+                      className="btn btn-small btn-quiet"
+                      disabled={!!pending}
+                      title="They answered: choose what the reply means"
+                      onClick={() =>
+                        setReplying({
+                          type: "contact",
+                          contact,
+                          kind: step!.kind,
+                        })
+                      }
+                    >
+                      <Reply size={15} /> Reply aaya
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-small btn-quiet"
+                    disabled={!!pending}
+                    title="Not replying or not accepting: set status to No Reply and remove from Today"
+                    onClick={() => void stopContact(contact)}
+                  >
+                    <BellOff size={15} /> Chhor do
+                  </button>
+                </div>
               </div>
             ))}
           </section>
@@ -396,6 +482,9 @@ export default function TodayPage() {
       )}
       {interview && (
         <InterviewForm interview={interview} close={() => setInterview(null)} />
+      )}
+      {replying && (
+        <ReplyDialog target={replying} close={() => setReplying(null)} />
       )}
       {selected && (
         <MessageDrawer

@@ -1,5 +1,9 @@
 import { localToday, daysBetween } from "./dates";
 import { FOLLOWUP_1_DAYS, FOLLOWUP_2_DAYS } from "./config";
+import {
+  ANSWERED_CONTACT_STATUSES,
+  STOPPED_CONTACT_STATUSES,
+} from "./followups";
 import type {
   Application,
   Contact,
@@ -178,9 +182,10 @@ export function contactNextStep(
   label: string;
   overdue: number;
 } | null {
-  if (["Closed", "Not Relevant"].includes(contact.status)) return null;
+  if (STOPPED_CONTACT_STATUSES.includes(contact.status)) return null;
   if (!contact.messaged)
     return { kind: "first_message", label: "First message", overdue: 0 };
+  if (ANSWERED_CONTACT_STATUSES.includes(contact.status)) return null;
   if (
     !contact.followup1_on &&
     contact.messaged_on &&

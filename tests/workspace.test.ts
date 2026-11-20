@@ -314,6 +314,21 @@ test("contact reminders respect timing and closed contacts; withdrawn applicatio
     null,
   );
   assert.equal(
+    contactNextStep(contact({ status: "No Reply" }), "2026-11-04"),
+    null,
+  );
+  assert.equal(
+    contactNextStep(
+      contact({
+        status: "Replied",
+        messaged: true,
+        messaged_on: "2026-10-20",
+      }),
+      "2026-11-04",
+    ),
+    null,
+  );
+  assert.equal(
     isDue(
       application({ status: "Withdrawn", contact_name: "Ali" }),
       "first_message",

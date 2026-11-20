@@ -1023,6 +1023,46 @@ td strong {
   flex-direction: column;
   gap: 18px;
 }
+.reply-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reply-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+.reply-option:hover {
+  border-color: #bfc9bb;
+}
+.reply-option.is-selected {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+.reply-option input {
+  margin-top: 3px;
+}
+.reply-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.reply-option strong {
+  font-size: 13px;
+}
+.reply-option small {
+  font-size: 11px;
+  color: #79886b;
+  line-height: 1.5;
+}
 .error-box {
   border: 1px solid #efd5ce;
   background: #fff4f0;
